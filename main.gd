@@ -5,6 +5,9 @@ extends Node2D
 @onready var label = $TurnLabel
 @onready var crown = $Crown
 @onready var restart_button = $RestartButton
+@onready var colSound = $Collision
+@onready var pointSound = $Point
+@onready var winSound = $Win
 
 
 var player1_start_pos: Vector2
@@ -18,6 +21,7 @@ var score_timer = 0.0
 
 var play := true
 var transDone := false
+var success := false
 
 
 func _ready():
@@ -57,18 +61,24 @@ func _process(delta):
 		if player1_is_tagged and play:
 			player2_score += 1
 			$p2Score.text = str(player2_score)
+			pointSound.play()
 		
 		elif not player1_is_tagged and play:
 			player1_score += 1
 			$p1Score.text = str(player1_score)
+			pointSound.play()
 		
 		else:
-			if player1_score == 100:
+			if player1_score == 100 and not success:
 				label.text = "Player 1 wins!"
 				label.modulate = Color(0.9, 0, 0)
-			else:
+				winSound.play()
+				success = true
+			elif player2_score == 100 and not success:
 				label.text = "Player 2 wins!"
 				label.modulate = Color(0, 0, 0.9)
+				winSound.play()
+				success = true
 				
 		if player1_score == 100 or player2_score == 100:
 			play = false
@@ -81,6 +91,7 @@ func tag_player():
 
 	# Switch who is "it"
 	player1_is_tagged = !player1_is_tagged
+	colSound.play()
 
 	update_tag_text()
 
